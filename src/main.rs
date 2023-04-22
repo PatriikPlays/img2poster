@@ -50,7 +50,21 @@ fn main() {
                 .required(false)
                 .value_parser(value_parser!(u32)),
         )
-        .arg(arg!(-l --label <LABEL> "Poster label").required(false))
+        .arg(
+            arg!(-l --label <LABEL> "Poster label")
+                .required(false)
+                .value_parser(value_parser!(String))
+        )
+        .arg(
+            arg!(-L --forcelabel <LABEL> "Overwrites default label which is: <Label>: (x,y)/(totalX*totalY)")
+                .required(false)
+                .value_parser(value_parser!(String))
+        )
+        .arg(
+            arg!(-T --forcetooltip <TOOLTIP> "Overwrites default tooltip which contains some information about the poster")
+                .required(false)
+                .value_parser(value_parser!(String))
+        )
         .get_matches();
 
     if let Some(input) = matches.get_one::<PathBuf>("input") {
@@ -128,12 +142,25 @@ fn main() {
                 return;
             }
 
+            let mut forced_label: bool = false;
             let label: String;
-            if let Some(txt) = matches.get_one::<u32>("label") {
+
+            if let Some(txt) = matches.get_one::<String>("forcelabel") {
+                label = txt.to_string();
+                forced_label = true;
+                if label.len() > 48 {
+                    println!(
+                        "Forced label can't be longer than 48 characters, currently {0}",
+                        label.len()
+                    );
+                    return;
+                }
+            } else if let Some(txt) = matches.get_one::<String>("label") {
+                println!("ASDASDSDAADS");
                 label = txt.to_string();
                 if label.len() > 23 {
                     println!(
-                        "Label cant be longer than 25 characters, currently {0}",
+                        "Label can't be longer than 25 characters, currently {0}",
                         label.len()
                     );
                     return;
@@ -141,6 +168,21 @@ fn main() {
             } else {
                 label = "PatriikPlays/img2poster".to_string();
             }
+
+            let mut use_forced_tooltip = false;
+            let mut forced_tooltip: String = "".to_string();
+            if let Some(txt) = matches.get_one::<String>("forcetooltip") {
+                forced_tooltip = txt.to_string();
+                use_forced_tooltip = true;
+                if forced_tooltip.len() > 256 {
+                    println!(
+                        "Forced tooltip can't be longer than 256 characters, currently {0}",
+                        forced_tooltip.len()
+                    );
+                    return;
+                }
+            }
+
 
             let mut posters: Vec<String> = Vec::new();
             println!("Converting image to posters");
@@ -170,7 +212,7 @@ fn main() {
                         }
                     }
 
-                    let (dithered_pixels, color_palette) = poster::dither(pixels);
+                    let (dithered_pixels, color_palette) = dither(pixels);
 
                     let tooltip: PosterTooltip = PosterTooltip {
                         print_id: random::<u32>(),
@@ -182,19 +224,30 @@ fn main() {
                         info: "https://github.com/PatriikPlays/img2poster".to_string(),
                     };
 
-                    let poster: Poster = Poster {
-                        label: format!(
+                    let tooltip_str: String;
+                    if use_forced_tooltip {
+                        tooltip_str = forced_tooltip.clone();
+                    } else {
+                        tooltip_str = serde_json::to_string(&tooltip).unwrap().as_str().to_string();
+                    }
+
+                    let label_str: String;
+                    if forced_label {
+                        label_str = label.clone();
+                    } else {
+                        label_str = format!(
                             "{0}: ({1},{2})/({3}x{4})",
                             label.clone(),
                             block_x+1,
                             block_y+1,
                             x_size / block_size,
                             y_size / block_size
-                        ),
-                        tooltip: serde_json::to_string(&tooltip)
-                            .unwrap()
-                            .as_str()
-                            .to_string(),
+                        )
+                    }
+
+                    let poster: Poster = Poster {
+                        label: label_str,
+                        tooltip: tooltip_str,
                         palette: color_palette,
                         pixels: dithered_pixels.as_slice(),
                         width: 128,
