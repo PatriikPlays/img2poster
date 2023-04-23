@@ -264,7 +264,12 @@ fn main() {
             let mut out_path = output.clone();
             if posters.len() > 1 {
                 out_path.set_extension("2dja");
-                fs::write(out_path, format!("[{0}]", posters.join(",")))
+                fs::write(out_path, format!(
+                    "{{{0},{1},{2},{3}}}",
+                    format!("\"pages\":[{0}]",posters.join(",")),
+                    format!("\"width\":{0}",x_size / block_size),
+                    format!("\"height\":{0}",y_size / block_size),
+                    format!("\"title\":\"{0}\"",label.clone())))
                     .expect("Failed to write to output file.");
             } else {
                 out_path.set_extension("2dj");
