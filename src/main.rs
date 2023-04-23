@@ -183,6 +183,7 @@ fn main() {
             }
 
             let mut posters: Vec<String> = Vec::new();
+            let print_id = random::<u32>();
             println!("Converting image to posters");
             let block_size = 128;
             for block_y in 0..y_size / block_size {
@@ -213,7 +214,7 @@ fn main() {
                     let (dithered_pixels, color_palette) = dither(pixels);
 
                     let tooltip: PosterTooltip = PosterTooltip {
-                        print_id: random::<u32>(),
+                        print_id,
                         print_name: label.clone(),
                         total_width: x_size / block_size,
                         total_height: y_size / block_size,
