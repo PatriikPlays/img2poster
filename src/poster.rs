@@ -33,7 +33,7 @@ pub fn dither(image_data: Vec<Color>) -> (Vec<u8>, Vec<u32>) {
         image_data_slice,
         128,
         63,
-        &optimizer::KMeans,
+        &optimizer::None,
         &ditherer::FloydSteinberg::new(),
     );
 
