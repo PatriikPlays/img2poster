@@ -156,7 +156,6 @@ fn main() {
                     return;
                 }
             } else if let Some(txt) = matches.get_one::<String>("label") {
-                println!("ASDASDSDAADS");
                 label = txt.to_string();
                 if label.len() > 23 {
                     println!(
@@ -182,7 +181,6 @@ fn main() {
                     return;
                 }
             }
-
 
             let mut posters: Vec<String> = Vec::new();
             println!("Converting image to posters");
@@ -228,7 +226,10 @@ fn main() {
                     if use_forced_tooltip {
                         tooltip_str = forced_tooltip.clone();
                     } else {
-                        tooltip_str = serde_json::to_string(&tooltip).unwrap().as_str().to_string();
+                        tooltip_str = serde_json::to_string(&tooltip)
+                            .unwrap()
+                            .as_str()
+                            .to_string();
                     }
 
                     let label_str: String;
@@ -238,8 +239,8 @@ fn main() {
                         label_str = format!(
                             "{0}: ({1},{2})/({3}x{4})",
                             label.clone(),
-                            block_x+1,
-                            block_y+1,
+                            block_x + 1,
+                            block_y + 1,
                             x_size / block_size,
                             y_size / block_size
                         )
@@ -262,7 +263,8 @@ fn main() {
             let mut out_path = output.clone();
             if posters.len() > 1 {
                 out_path.set_extension("2dja");
-                fs::write(out_path, format!("[{0}]", posters.join(","))).expect("Failed to write to output file.");
+                fs::write(out_path, format!("[{0}]", posters.join(",")))
+                    .expect("Failed to write to output file.");
             } else {
                 out_path.set_extension("2dj");
                 fs::write(out_path, &posters[0]).expect("Failed to write to output file.");
