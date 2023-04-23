@@ -36,7 +36,7 @@ fn main() {
                 .value_parser(value_parser!(PathBuf)),
         )
         .arg(
-            arg!(-o --output <OUTPUT_FILE> "Sets output file (file extension is automatically set, do not specify)")
+            arg!(-o --output <OUTPUT_FILE> "Sets output file (file extension is automatically set to 2dj or 2dja)")
                 .required(true)
                 .value_parser(value_parser!(PathBuf)),
         )
@@ -56,12 +56,12 @@ fn main() {
                 .value_parser(value_parser!(String))
         )
         .arg(
-            arg!(-L --forcelabel <LABEL> "Overwrites default label which is: <Label>: (x,y)/(totalX*totalY)")
+            arg!(-L --forcelabel <LABEL> "Overwrites default label which is: '<Label>: (x,y)/(totalX*totalY)'")
                 .required(false)
                 .value_parser(value_parser!(String))
         )
         .arg(
-            arg!(-T --forcetooltip <TOOLTIP> "Overwrites default tooltip which contains some information about the poster")
+            arg!(-T --forcetooltip <TOOLTIP> "Overwrites default tooltip which contains json information about the poster")
                 .required(false)
                 .value_parser(value_parser!(String))
         )
