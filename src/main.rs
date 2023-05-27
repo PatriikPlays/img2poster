@@ -65,6 +65,18 @@ fn main() {
                 .required(false)
                 .value_parser(value_parser!(String))
         )
+        .arg(
+            arg!(-O --optimizer <OPTIMIZER> "Select optimizer, options are NONE/KMEANS/WEIGHTEDKMEANS")
+                .required(false)
+                .value_parser(value_parser!(String))
+                .default_value("KMEANS")
+        )
+        .arg(
+            arg!(-D --ditherer <DITHERER> "Select ditherer, options are NONE/ORDERED/FLOYDSTEINBERG")
+                .required(false)
+                .value_parser(value_parser!(String))
+                .default_value("FLOYDSTEINBERG")
+        )
         .get_matches();
 
     if let Some(input) = matches.get_one::<PathBuf>("input") {
