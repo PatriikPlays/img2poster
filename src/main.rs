@@ -273,6 +273,7 @@ fn main() {
     } else {
         let mut pixels: Vec<Color> = Vec::with_capacity((block_size * block_size) as usize);
 
+        print!("Parsing image... ");
         for y in 0..y_size {
             for x in 0..x_size {
                 let pixel = unwrapped_image.get_pixel(x, y);
@@ -280,17 +281,12 @@ fn main() {
                 let rgb = pixel.to_rgb();
                 pixels.push(Color::new(rgb[0], rgb[1], rgb[2], 255));
             }
-
-            println!(
-                "Parsing image: {0}% complete",
-                f32::min(
-                    100 as f32,
-                    f32::max(0 as f32, (y as f32) / (y_size as f32)) * (100 as f32)
-                )
-            );
         }
+        println!("Done");
 
+        print!("Quantizing and dithering image... ");
         let (dithered_pixels, color_palette) = dither(pixels, x_size as usize);
+        println!("Done");
 
         for block_y in 0..y_size / block_size {
             for block_x in 0..x_size / block_size {
@@ -352,9 +348,18 @@ fn main() {
                 let json = serde_json::to_string(&poster).unwrap();
                 posters.push(json.as_str().to_string());
             }
+
+            println!(
+                "Splitting image into posters: {0}% complete",
+                f32::min(
+                    100 as f32,
+                    f32::max(0 as f32, block_y as f32 / ((y_size / block_size) as f32)) * (100 as f32)
+                )
+            );
         }
+        println!("Splitting image into posters: 100% complete");
     }
-    println!("100% complete");
+    println!("Done, saving to file");
 
     let mut out_path = output.clone();
     if posters.len() > 1 {
