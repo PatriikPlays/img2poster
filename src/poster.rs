@@ -27,13 +27,13 @@ fn rgb_to_hex(red: u8, green: u8, blue: u8) -> u32 {
     ((red as u32) << 16) | ((green as u32) << 8) | blue as u32
 }
 
-pub fn dither(image_data: Vec<Color>) -> (Vec<u8>, Vec<u32>) {
+pub fn dither(image_data: Vec<Color>, width: usize) -> (Vec<u8>, Vec<u32>) {
     let image_data_slice: &[Color] = &image_data;
     let (palette, indexed_data) = convert_to_indexed(
         image_data_slice,
-        128,
+        width,
         63,
-        &optimizer::None,
+        &optimizer::KMeans,
         &ditherer::FloydSteinberg::new(),
     );
 
