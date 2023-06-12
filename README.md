@@ -35,7 +35,7 @@ Aliases:
 
 Examples:
 
-* `-i apioform.png`
+* `-i ./apioform.png`
 * `-i /home/me/images/capy64.jpg`
 * `--input ../mfw.jpg`
 
@@ -53,13 +53,13 @@ Aliases:
 
 Examples:
 
-* `-o myPoster`
-* `--output mySuperCoolPoster`
+* `-o ./myPoster`
+* `--output ./mySuperCoolPoster`
 
 Do **not** do this:
 
 * `-o myPoster.2dj`
-* `--output anotherPoster.2dja`
+* `--output ./anotherPoster.2dja`
 
 ### Scale X
 
