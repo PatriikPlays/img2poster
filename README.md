@@ -4,7 +4,7 @@
 
 Image to poster CLI converter tool for [SwitchCraft3](https://sc3.io) posters.
 
-img2poster is written in rust for speed and efficency! You can create giant posters in seconds.
+img2poster is written in rust for speed and efficency! It is faster than most other implementations of 2dj(a).
 
 ## Installation
 
