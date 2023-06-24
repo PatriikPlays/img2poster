@@ -13,12 +13,12 @@ pub struct PosterTooltip {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Poster<'a> {
+pub struct Poster {
     pub label: String,
     pub tooltip: String,
     pub palette: Vec<u32>,
     #[serde(with = "serde_bytes")]
-    pub pixels: &'a [u8],
+    pub pixels: Vec<u8>,
     pub width: u32,
     pub height: u32,
 }

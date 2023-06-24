@@ -17,7 +17,7 @@ cargo = ["clap/cargo"]
 serde = ["serde/derive"]
 
 [dependencies]
-clap = { version = "4.2.4", features = ["cargo"] }
+clap = { version = "4.2.4", features = ["derive"] }
 image = "0.24.6"
 exoquant = "0.2.0"
 serde = { version = "1.0.160", features = ["derive"] }
