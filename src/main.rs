@@ -1,6 +1,6 @@
 mod poster;
 
-use clap::{arg, value_parser, command, Parser};
+use clap::{arg, command, Parser};
 use exoquant::Color;
 use image::io::Reader as ImageReader;
 use image::{imageops::FilterType, DynamicImage, GenericImageView, Pixel};
@@ -174,7 +174,7 @@ fn main() {
         }
     }
 
-    let mut posters: Vec<String> = Vec::new();
+    let mut posters: Vec<Poster> = Vec::new();
 
     let print_id = random::<u32>();
     println!("Converting image to posters");
@@ -246,13 +246,12 @@ fn main() {
                     label: label_str,
                     tooltip: tooltip_str,
                     palette: color_palette,
-                    pixels: dithered_pixels.as_slice(),
+                    pixels: dithered_pixels,
                     width: 128,
                     height: 128,
                 };
 
-                let json = serde_json::to_string(&poster).unwrap();
-                posters.push(json.as_str().to_string());
+                posters.push(poster);
             }
         }
     } else {
@@ -325,13 +324,12 @@ fn main() {
                     label: label_str,
                     tooltip: tooltip_str,
                     palette: color_palette.clone(),
-                    pixels: block_pixels.as_slice(),
+                    pixels: block_pixels,
                     width: 128,
                     height: 128,
                 };
 
-                let json = serde_json::to_string(&poster).unwrap();
-                posters.push(json.as_str().to_string());
+                posters.push(poster);
             }
 
             println!(
@@ -349,19 +347,11 @@ fn main() {
     let mut out_path = cli.output.clone();
     if posters.len() > 1 {
         out_path.set_extension("2dja");
-        fs::write(
-            out_path,
-            format!(
-                "{{{0},{1},{2},{3}}}",
-                format!("\"pages\":[{0}]", posters.join(",")),
-                format!("\"width\":{0}", x_size / block_size),
-                format!("\"height\":{0}", y_size / block_size),
-                format!("\"title\":\"{0}\"", label.clone())
-            ),
-        )
-        .expect("Failed to write to output file.");
+        let json_str = serde_json::to_string(&posters).expect("Failed to serialize this somehow");
+        fs::write(out_path, json_str).expect("Failed to write to output file.");
     } else {
         out_path.set_extension("2dj");
-        fs::write(out_path, &posters[0]).expect("Failed to write to output file.");
+        let json_str = serde_json::to_string(&posters[0]).expect("Failed to serialize this somehow");
+        fs::write(out_path, json_str).expect("Failed to write to output file.");
     }
 }
