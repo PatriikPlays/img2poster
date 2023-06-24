@@ -1,6 +1,6 @@
 mod poster;
 
-use clap::{arg, command, value_parser};
+use clap::{arg, value_parser, command, Parser};
 use exoquant::Color;
 use image::io::Reader as ImageReader;
 use image::{imageops::FilterType, DynamicImage, GenericImageView, Pixel};
@@ -10,6 +10,34 @@ use std::fs;
 use std::path::PathBuf;
 
 //const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+#[derive(clap::Parser)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    #[arg(short, long, value_name = "INPUT_FILE")]
+    input: PathBuf,
+
+    #[arg(short, long, value_name = "OUTPUT_FILE")]
+    output: PathBuf,
+
+    #[arg(short = 'x', long, value_name = "SCALE_X")]
+    scale_x: Option<u32>,
+
+    #[arg(short = 'y', long, value_name = "SCALE_Y")]
+    scale_y: Option<u32>,
+
+    #[arg(short, long, value_name = "LABEL")]
+    label: Option<String>,
+
+    #[arg(short = 'L', long = "forcelabel", value_name = "LABEL")]
+    force_label: Option<String>,
+
+    #[arg(short = 'T', long = "forcetooltip", value_name = "TOOLTIP")]
+    force_tooltip: Option<String>,
+
+    #[arg(short = 'q', long, value_name = "PER_POSTER_QUANT")]
+    per_poster_quantization: Option<bool>
+}
 
 fn read_image(image_file: &PathBuf) -> (bool, Option<DynamicImage>) {
     let image_reader = ImageReader::open(image_file);
@@ -29,73 +57,30 @@ fn read_image(image_file: &PathBuf) -> (bool, Option<DynamicImage>) {
 }
 
 fn main() {
-    let matches = command!()
-        .arg(
-            arg!(-i --input <INPUT_FILE> "Sets input image file")
-                .required(true)
-                .value_parser(value_parser!(PathBuf)),
-        )
-        .arg(
-            arg!(-o --output <OUTPUT_FILE> "Sets output file (file extension is automatically set to 2dj or 2dja)")
-                .required(true)
-                .value_parser(value_parser!(PathBuf)),
-        )
-        .arg(
-            arg!(-x --scalex <X_RESOLUTION> "Scales input image to specified X resolution")
-                .required(false)
-                .value_parser(value_parser!(u32)),
-        )
-        .arg(
-            arg!(-y --scaley <Y_RESOLUTION> "Scales input image to specified Y resolution")
-                .required(false)
-                .value_parser(value_parser!(u32)),
-        )
-        .arg(
-            arg!(-l --label <LABEL> "Poster label")
-                .required(false)
-                .value_parser(value_parser!(String))
-        )
-        .arg(
-            arg!(-L --forcelabel <LABEL> "Overwrites default label which is: '<Label>: (x,y)/(totalX*totalY)'")
-                .required(false)
-                .value_parser(value_parser!(String))
-        )
-        .arg(
-            arg!(-T --forcetooltip <TOOLTIP> "Overwrites default tooltip which contains json information about the poster")
-                .required(false)
-                .value_parser(value_parser!(String))
-        )
-        .arg(
-            arg!(-Q --perPosterQuantization "Enable per poster quantization")
-                .required(false)
-        )
-        .get_matches();
+    let cli = Cli::parse();
 
-    let per_poster_quantization_enabled = matches.get_one::<bool>("perPosterQuantization").unwrap();
+    let per_poster_quantization_enabled = cli.per_poster_quantization.unwrap_or(false) == true;
 
-    let input = matches.get_one::<PathBuf>("input").unwrap();
-    let output = matches.get_one::<PathBuf>("output").unwrap();
-
-    if !input.exists() {
+    if !cli.input.exists() {
         println!("Input file doesn't exist.");
         return;
     }
-    if input.is_dir() {
+    if cli.input.is_dir() {
         println!("Input can't be a directory.");
         return;
     }
 
-    if output.is_dir() {
+    if cli.output.is_dir() {
         println!("Output can't be a directory.");
         return;
     }
 
-    if !output.parent().unwrap().exists() {
+    if !cli.output.parent().unwrap().exists() {
         println!("Output file parent directory doesn't exist.");
         return;
     }
 
-    let (image_ok, image) = read_image(input);
+    let (image_ok, image) = read_image(&cli.input);
     if !image_ok {
         println!("Failed to decode or open image.");
         return;
@@ -108,14 +93,14 @@ fn main() {
         let mut resize = false;
         let (mut resize_x, mut resize_y) = (x_size, y_size);
 
-        if let Some(res) = matches.get_one::<u32>("scalex") {
+        if let Some(res) = cli.scale_x {
             resize = true;
-            resize_x = *res;
+            resize_x = res;
         }
 
-        if let Some(res) = matches.get_one::<u32>("scaley") {
+        if let Some(res) = cli.scale_y {
             resize = true;
-            resize_y = *res;
+            resize_y = res;
         }
 
         if resize && (resize_x < 1 || resize_y < 1) {
@@ -152,7 +137,7 @@ fn main() {
     let mut forced_label: bool = false;
     let label: String;
 
-    if let Some(txt) = matches.get_one::<String>("forcelabel") {
+    if let Some(txt) = cli.force_label {
         label = txt.to_string();
         forced_label = true;
         if label.len() > 48 {
@@ -162,7 +147,7 @@ fn main() {
             );
             return;
         }
-    } else if let Some(txt) = matches.get_one::<String>("label") {
+    } else if let Some(txt) = cli.label {
         label = txt.to_string();
         if label.len() > 23 {
             println!(
@@ -177,7 +162,7 @@ fn main() {
 
     let mut use_forced_tooltip = false;
     let mut forced_tooltip: String = "".to_string();
-    if let Some(txt) = matches.get_one::<String>("forcetooltip") {
+    if let Some(txt) = cli.force_tooltip {
         forced_tooltip = txt.to_string();
         use_forced_tooltip = true;
         if forced_tooltip.len() > 256 {
@@ -361,7 +346,7 @@ fn main() {
     }
     println!("Done, saving to file");
 
-    let mut out_path = output.clone();
+    let mut out_path = cli.output.clone();
     if posters.len() > 1 {
         out_path.set_extension("2dja");
         fs::write(
