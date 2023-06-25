@@ -35,8 +35,8 @@ struct Cli {
     #[arg(short = 'T', long = "forcetooltip", value_name = "TOOLTIP")]
     force_tooltip: Option<String>,
 
-    #[arg(short = 'q', long, value_name = "PER_POSTER_QUANT")]
-    per_poster_quantization: Option<bool>
+    #[arg(short = 'Q', long)]
+    per_poster_quantization: bool
 }
 
 fn read_image(image_file: &PathBuf) -> (bool, Option<DynamicImage>) {
@@ -59,7 +59,7 @@ fn read_image(image_file: &PathBuf) -> (bool, Option<DynamicImage>) {
 fn main() {
     let cli = Cli::parse();
 
-    let per_poster_quantization_enabled = cli.per_poster_quantization.unwrap_or(false) == true;
+    let per_poster_quantization_enabled = cli.per_poster_quantization;
 
     if !cli.input.exists() {
         println!("Input file doesn't exist.");
