@@ -1,13 +1,14 @@
 mod poster;
+mod image_to_poster;
 
 use clap::{arg, command, Parser};
 use exoquant::Color;
 use image::io::Reader as ImageReader;
 use image::{imageops::FilterType, DynamicImage, GenericImageView, Pixel};
 use poster::*;
-use rand::random;
 use std::fs;
 use std::path::PathBuf;
+use rand::Rng;
 
 //const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -151,7 +152,7 @@ fn main() {
         label = txt.to_string();
         if label.len() > 23 {
             println!(
-                "Label can't be longer than 25 characters, currently {0}",
+                "Label can't be longer than 23 characters, currently {0}",
                 label.len()
             );
             return;
@@ -174,174 +175,49 @@ fn main() {
         }
     }
 
-    let mut posters: Vec<Poster> = Vec::new();
 
-    let print_id = random::<u32>();
-    println!("Converting image to posters");
+    let print_id = format!("{:0>6}",rand::thread_rng().gen_range(0..999999));
 
-    let block_size = 128;
-    if per_poster_quantization_enabled.clone() {
-        for block_y in 0..y_size / block_size {
-            println!(
-                "{0}% complete",
-                f32::min(
-                    100 as f32,
-                    f32::max(
-                        0 as f32,
-                        (block_y as f32) / ((y_size as f32) / (block_size as f32))
-                    ) * (100 as f32)
+    let mut posters : Vec<Poster> = image_to_poster::image_to_posters(
+        unwrapped_image,
+        |x,y,w,h| {
+            if forced_label {
+                return label.clone();
+            } else {
+                return format!(
+                    "{0}: ({1},{2})/({3}x{4})",
+                    label.clone(),
+                    x+1,
+                    y+1,
+                    w,
+                    h
                 )
-            );
-
-            for block_x in 0..x_size / block_size {
-                let mut pixels: Vec<Color> = Vec::new();
-
-                for y in 0..block_size {
-                    for x in 0..block_size {
-                        let pixel = unwrapped_image
-                            .get_pixel(x + block_x * block_size, y + block_y * block_size);
-
-                        let rgb = pixel.to_rgb();
-                        pixels.push(Color::new(rgb[0], rgb[1], rgb[2], 255));
-                    }
-                }
-
-                let (dithered_pixels, color_palette) = dither(pixels, block_size as usize);
-
-                let tooltip: PosterTooltip = PosterTooltip {
-                    print_id,
-                    print_name: label.clone(),
-                    total_width: x_size / block_size,
-                    total_height: y_size / block_size,
-                    pos_x: block_x,
-                    pos_y: block_y,
-                    info: "https://github.com/PatriikPlays/img2poster".to_string(),
-                };
-
-                let tooltip_str: String;
-                if use_forced_tooltip {
-                    tooltip_str = forced_tooltip.clone();
-                } else {
-                    tooltip_str = serde_json::to_string(&tooltip)
-                        .unwrap()
-                        .as_str()
-                        .to_string();
-                }
-
-                let label_str: String;
-                if forced_label {
-                    label_str = label.clone();
-                } else {
-                    label_str = format!(
-                        "{0}: ({1},{2})/({3}x{4})",
-                        label.clone(),
-                        block_x + 1,
-                        block_y + 1,
-                        x_size / block_size,
-                        y_size / block_size
-                    )
-                }
-
-                let poster: Poster = Poster {
-                    label: label_str,
-                    tooltip: tooltip_str,
-                    palette: color_palette,
-                    pixels: dithered_pixels,
-                    width: 128,
-                    height: 128,
-                };
-
-                posters.push(poster);
             }
-        }
-    } else {
-        let mut pixels: Vec<Color> = Vec::with_capacity((block_size * block_size) as usize);
+        },
+        |x,y,w,h| {
+            let tooltip: PosterTooltip = PosterTooltip {
+                print_id: print_id.clone(),
+                print_name: label.clone(),
+                total_width: w,
+                total_height: h,
+                pos_x: x,
+                pos_y: y,
+                info: "https://github.com/PatriikPlays/img2poster".to_string(),
+            };
 
-        print!("Parsing image... ");
-        for y in 0..y_size {
-            for x in 0..x_size {
-                let pixel = unwrapped_image.get_pixel(x, y);
-
-                let rgb = pixel.to_rgb();
-                pixels.push(Color::new(rgb[0], rgb[1], rgb[2], 255));
+            if use_forced_tooltip {
+                return forced_tooltip.clone();
+            } else {
+                return serde_json::to_string(&tooltip)
+                    .unwrap()
+                    .as_str()
+                    .to_string();
             }
-        }
-        println!("Done");
+        },
+        per_poster_quantization_enabled
+    );
 
-        print!("Quantizing and dithering image... ");
-        let (dithered_pixels, color_palette) = dither(pixels, x_size as usize);
-        println!("Done");
 
-        for block_y in 0..y_size / block_size {
-            for block_x in 0..x_size / block_size {
-                let mut block_pixels: Vec<u8> =
-                    Vec::with_capacity((block_size * block_size) as usize);
-                for in_block_y in 0..block_size {
-                    for in_block_x in 0..block_size {
-                        block_pixels.push(
-                            dithered_pixels[((block_y * block_size + in_block_y) * x_size
-                                + block_x * block_size
-                                + in_block_x) as usize],
-                        );
-                    }
-                }
-
-                let tooltip: PosterTooltip = PosterTooltip {
-                    print_id,
-                    print_name: label.clone(),
-                    total_width: x_size / block_size,
-                    total_height: y_size / block_size,
-                    pos_x: block_x,
-                    pos_y: block_y,
-                    info: "https://github.com/PatriikPlays/img2poster".to_string(),
-                };
-
-                let tooltip_str: String;
-                if use_forced_tooltip {
-                    tooltip_str = forced_tooltip.clone();
-                } else {
-                    tooltip_str = serde_json::to_string(&tooltip)
-                        .unwrap()
-                        .as_str()
-                        .to_string();
-                }
-
-                let label_str: String;
-                if forced_label {
-                    label_str = label.clone();
-                } else {
-                    label_str = format!(
-                        "{0}: ({1},{2})/({3}x{4})",
-                        label.clone(),
-                        block_x + 1,
-                        block_y + 1,
-                        x_size / block_size,
-                        y_size / block_size
-                    )
-                }
-
-                let poster: Poster = Poster {
-                    label: label_str,
-                    tooltip: tooltip_str,
-                    palette: color_palette.clone(),
-                    pixels: block_pixels,
-                    width: 128,
-                    height: 128,
-                };
-
-                posters.push(poster);
-            }
-
-            println!(
-                "Splitting image into posters: {0}% complete",
-                f32::min(
-                    100 as f32,
-                    f32::max(0 as f32, block_y as f32 / ((y_size / block_size) as f32)) * (100 as f32)
-                )
-            );
-        }
-        println!("Splitting image into posters: 100% complete");
-    }
     println!("Done, saving to file");
 
     let mut out_path = cli.output.clone();

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct PosterTooltip {
-    pub print_id: u32,
+    pub print_id: String,
     pub print_name: String,
     pub total_width: u32,
     pub total_height: u32,
