@@ -1,7 +1,7 @@
 use exoquant::Color;
 use image::{DynamicImage, GenericImageView, Pixel};
 use crate::poster;
-use crate::poster::{Poster, PosterTooltip};
+use crate::poster::{Poster};
 
 pub fn image_to_posters<F1,F2>(image: DynamicImage, label_generator: F1, tooltip_generator: F2, per_poster_quantization: bool) -> Vec<Poster>
 where
@@ -10,7 +10,7 @@ where
 {
     let mut posters: Vec<Poster> = Vec::new();
 
-    let (mut x_size, mut y_size) = image.dimensions();
+    let (x_size, y_size) = image.dimensions();
 
     let block_size = 128;
     if per_poster_quantization {

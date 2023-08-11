@@ -2,15 +2,12 @@ mod poster;
 mod image_to_poster;
 
 use clap::{arg, command, Parser};
-use exoquant::Color;
 use image::io::Reader as ImageReader;
-use image::{imageops::FilterType, DynamicImage, GenericImageView, Pixel};
+use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use poster::*;
 use std::fs;
 use std::path::PathBuf;
 use rand::Rng;
-
-//const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(clap::Parser)]
 #[command(author, version, about, long_about = None)]
@@ -178,7 +175,7 @@ fn main() {
 
     let print_id = format!("{:0>6}",rand::thread_rng().gen_range(0..999999));
 
-    let mut posters : Vec<Poster> = image_to_poster::image_to_posters(
+    let posters : Vec<Poster> = image_to_poster::image_to_posters(
         unwrapped_image,
         |x,y,w,h| {
             if forced_label {
