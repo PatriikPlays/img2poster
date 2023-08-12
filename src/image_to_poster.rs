@@ -3,16 +3,23 @@ use image::{DynamicImage, GenericImageView, Pixel};
 use crate::poster;
 use crate::poster::{Poster};
 
-pub fn image_to_posters<F1,F2>(image: DynamicImage, label_generator: F1, tooltip_generator: F2, per_poster_quantization: bool) -> Vec<Poster>
+pub fn image_to_posters<F1,F2>(image: DynamicImage, label_generator: F1, tooltip_generator: F2, per_poster_quantization: bool) -> poster::PosterArray
 where
     F1: Fn(u32, u32, u32, u32) -> String, // label_generator:   pos_x, pos_y, width, height
     F2: Fn(u32, u32, u32, u32) -> String, // tooltip_generator: pos_x, pos_y, width, height
 {
-    let mut posters: Vec<Poster> = Vec::new();
-
-    let (x_size, y_size) = image.dimensions();
+    //let mut poster_array.pages: Vec<Poster> = Vec::new();
 
     let block_size = 128;
+    let (x_size, y_size) = image.dimensions();
+
+    let mut poster_array: poster::PosterArray = poster::PosterArray {
+        pages: Vec::new(),
+        width: x_size/block_size,
+        height: y_size/block_size,
+        title: "untitled".to_string(), // TODO: do title
+    };
+
     if per_poster_quantization {
         for block_y in 0..y_size / block_size {
             println!(
@@ -50,7 +57,7 @@ where
                     height: block_size,
                 };
 
-                posters.push(poster);
+                poster_array.pages.push(poster);
             }
         }
     } else {
@@ -94,7 +101,7 @@ where
                     height: block_size,
                 };
 
-                posters.push(poster);
+                poster_array.pages.push(poster);
             }
 
             println!(
@@ -108,5 +115,5 @@ where
         println!("Splitting image into posters: 100% complete");
     }
 
-    return posters;
+    return poster_array;
 }
