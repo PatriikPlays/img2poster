@@ -129,6 +129,27 @@ fn main() {
         }
     };
 
+    // TODO: clean up
+    if input_format == Format::Poster {
+        if cli.per_poster_quantization {
+            eprintln!("per-poster-quantization flag only allowed with input format: Image");
+        }
+        if cli.label.is_some() {
+            eprintln!("label arg only allowed with input format: Image");
+        }
+        if cli.force_label.is_some() {
+            eprintln!("force-label arg only allowed with input format: Image");
+        }
+        if cli.force_tooltip.is_some() {
+            eprintln!("force-tooltip arg only allowed with input format: Image");
+        }
+        if cli.scale_x.is_some() {
+            eprintln!("scale-x arg only allowed with input format: Image");
+        }
+        if cli.scale_y.is_some() {
+            eprintln!("scale-y arg only allowed with input format: Image");
+        }
+    }
 
     let mut poster_array: poster::PosterArray;
     if input_format == Format::Image {
@@ -281,11 +302,11 @@ fn main() {
             let reader = File::open(cli.input).expect("Failed to open input file.");
             poster_array = serde_json::from_reader(reader).unwrap();
         } else {
-            println!("Shouldn't have gotten here 0");
+            eprintln!("Shouldn't have gotten here 0");
             return;
         }
     } else {
-        println!("Shouldn't have gotten here 1");
+        eprintln!("Shouldn't have gotten here 1");
         return;
     }
 
