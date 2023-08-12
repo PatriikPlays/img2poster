@@ -17,16 +17,17 @@ img2poster is written in rust for speed and efficiency! It is faster than most o
 ### Linux
 
 1. Download the latest Linux executable from GitHub releases. `img2poster-lnx`
-2. Open your terminal of choice (bash)
+2. Open your terminal of choice
 3. Use it! Check the usage guide below.
 
-## Usage
+## Usage (for 0.0.7)
 
-img2poster is a CLI to convert images to posters. See the CLI argument and flags below:
+img2poster is a CLI to convert between images and posters. See the CLI argument and flags below:
 
+---
 ### Input **(Required)**
 
-The input argument is the file path to the source image you want to convert into a poster.
+The input argument is the file path to the source image/poster you want to convert into a poster/image.
 
 Aliases:
 
@@ -38,13 +39,13 @@ Examples:
 * `-i ./apioform.png`
 * `-i /home/me/images/capy64.jpg`
 * `--input ../mfw.jpg`
+* `-i ./poster.2dj`
+* `-i ./poster.2dja`
 
+---
 ### Output **(Required)**
 
-The output argument is the file path where you want your poster files to end up.
-
-> **Note**
-> You should not include the file extension. This is automatically set by the program.
+The output argument is the file path where you want your poster/image files to end up.
 
 Aliases:
 
@@ -53,17 +54,18 @@ Aliases:
 
 Examples:
 
-* `-o ./myPoster`
-* `--output ./mySuperCoolPoster`
-
-Do **not** do this:
-
 * `-o myPoster.2dj`
 * `--output ./anotherPoster.2dja`
+* `-o myImage.png`
+* `--output myImage.jpg`
 
+---
 ### Scale X
 
 The scale-x argument is the amount of pixels on the X axis to scale the poster to. A single poster is always 128x128, which means that **this field has to be a multiple of 128.**
+
+> Note
+> Only use with image input files, not 2dj/2dja
 
 Aliases:
 
@@ -76,9 +78,13 @@ Examples:
 * `-x 384`
 * `--scalex 128`
 
+---
 ### Scale Y
 
 The scale-y argument is the amount of pixels on the Y axis to scale the poster to. A single poster is always 128x128, which means that this field has to be a multiple of 128.
+
+> Note
+> Only use with image input files, not 2dj/2dja
 
 Aliases:
 
@@ -91,9 +97,13 @@ Examples:
 * `-y 384`
 * `--scaley 128`
 
+---
 ### Poster Label
 
 The poster label argument is what to label the poster as.
+
+> Note
+> Only use with image input files, not 2dj/2dja
 
 > **Note**
 > The poster label cannot be longer than 25 characters
@@ -108,9 +118,13 @@ Examples:
 * `-l myPoster`
 * `--label ApioformPoster2`
 
+---
 ### Force poster label
 
 The force poster label argument is able to overwrite the actual label, instead of the default `<Label>: (x,y)/(totalX*totalY)`.
+
+> Note
+> Only use with image input files, not 2dj/2dja
 
 Aliases:
 
@@ -122,9 +136,13 @@ Examples:
 * `-L FunnyPoster`
 * `--forcelabel veryPostery`
 
+---
 ### Force poster tooltip
 
 The force poster tooltip argument is similar to the "Force poster label" argument, except this one overwrites the tooltip instead of the default JSON information
+
+> Note
+> Only use with image input files, not 2dj/2dja
 
 Aliases:
 
@@ -136,9 +154,13 @@ Examples:
 * `-T MyCoolTooltip`
 * `--forcetooltip VeryTooltip`
 
+---
 ### Per poster quantization
 
 The per poster *quantization* **flag** makes the program select the colorpalette on a per-poster basis.
+
+> Note
+> Only use with image input files, not 2dj/2dja
 
 Aliases:
 
