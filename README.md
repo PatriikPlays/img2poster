@@ -20,7 +20,7 @@ img2poster is written in rust for speed and efficiency! It is faster than most o
 2. Open your terminal of choice
 3. Use it! Check the usage guide below.
 
-## Usage (for 0.0.7)
+## Usage (for 0.0.8)
 
 img2poster is a CLI to convert between images and posters. See the CLI argument and flags below:
 
