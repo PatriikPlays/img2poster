@@ -47,7 +47,6 @@ pub fn posters_to_dynamic_image(poster_array: &PosterArray) -> DynamicImage {
 
         for (pixel_index, pixel) in poster.pixels.iter().enumerate() {
             let palette_index = *pixel as usize;
-            let color_value = poster.palette[palette_index-1];
             let color;
 
             if palette_index == 0 {
@@ -55,6 +54,10 @@ pub fn posters_to_dynamic_image(poster_array: &PosterArray) -> DynamicImage {
                     0: [0u8,0u8,0u8,0u8]
                 };
             } else {
+                if poster.palette.len() < palette_index {
+                    panic!("Invalid poster: found color {}, but poster only contains {} palette colors.", palette_index, poster.palette.len());
+                }
+                let color_value = poster.palette[palette_index-1];
                 color = Rgba {
                     0: [
                         ((color_value >> 16) & 0xFF) as u8,

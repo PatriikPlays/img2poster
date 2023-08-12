@@ -297,10 +297,10 @@ fn main() {
                 title: "untitled".to_string(),
             };
             let reader = File::open(cli.input).expect("Failed to open input file.");
-            poster_array.pages.push(serde_json::from_reader(reader).unwrap());
+            poster_array.pages.push(serde_json::from_reader(reader).expect("Failed to parse json in input file"));
         } else if input_extension == "2dja" {
             let reader = File::open(cli.input).expect("Failed to open input file.");
-            poster_array = serde_json::from_reader(reader).unwrap();
+            poster_array = serde_json::from_reader(reader).expect("Failed to parse json in input file");
         } else {
             eprintln!("Shouldn't have gotten here 0");
             return;
