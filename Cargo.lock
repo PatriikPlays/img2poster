@@ -384,7 +384,7 @@ dependencies = [
 
 [[package]]
 name = "img2poster"
-version = "0.0.9"
+version = "0.0.10"
 dependencies = [
  "clap",
  "exoquant",

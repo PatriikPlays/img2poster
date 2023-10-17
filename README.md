@@ -20,7 +20,7 @@ img2poster is written in rust for speed and efficiency! It is faster than most o
 2. Open your terminal of choice
 3. Use it! Check the usage guide below.
 
-## Usage (for 0.0.9)
+## Usage (for 0.1.0)
 
 img2poster is a CLI to convert between images and posters. See the CLI argument and flags below:
 
@@ -80,8 +80,11 @@ Examples:
 
 The scale-x argument is the amount of pixels on the X axis to scale the poster to. A single poster is always 128x128, which means that **this field has to be a multiple of 128.**
 
-> Note
+> **Note**
 > Only use with image input files, not 2dj/2dja
+
+> **Note**
+> Cannot be used with autoscale
 
 Aliases:
 
@@ -99,8 +102,11 @@ Examples:
 
 The scale-y argument is the amount of pixels on the Y axis to scale the poster to. A single poster is always 128x128, which means that this field has to be a multiple of 128.
 
-> Note
+> **Note**
 > Only use with image input files, not 2dj/2dja
+
+> **Note**
+> Cannot be used with autoscale
 
 Aliases:
 
@@ -118,7 +124,7 @@ Examples:
 
 The poster label argument is what to label the poster as.
 
-> Note
+> **Note**
 > Only use with image input files, not 2dj/2dja
 
 > **Note**
@@ -139,7 +145,7 @@ Examples:
 
 The force poster label argument is able to overwrite the actual label, instead of the default `<Label>: (x,y)/(totalX*totalY)`.
 
-> Note
+> **Note**
 > Only use with image input files, not 2dj/2dja
 
 Aliases:
@@ -157,7 +163,7 @@ Examples:
 
 The force poster tooltip argument is similar to the "Force poster label" argument, except this one overwrites the tooltip instead of the default JSON information
 
-> Note
+> **Note**
 > Only use with image input files, not 2dj/2dja
 
 Aliases:
@@ -175,7 +181,7 @@ Examples:
 
 The per poster *quantization* **flag** makes the program select the colorpalette on a per-poster basis.
 
-> Note
+> **Note**
 > Only use with image input files, not 2dj/2dja
 
 Aliases:
