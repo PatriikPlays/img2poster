@@ -47,7 +47,10 @@ struct Cli {
     force_tooltip: Option<String>,
 
     #[arg(short = 'Q', long)]
-    per_poster_quantization: bool
+    per_poster_quantization: bool,
+
+    #[arg(short = 'j', long, value_name = "JOBS")]
+    jobs: Option<u32>
 }
 
 fn read_image(image_file: &PathBuf) -> (bool, Option<DynamicImage>) {
@@ -333,15 +336,18 @@ fn main() {
 
         let print_id = format!("{:0>6}",rand::thread_rng().gen_range(0..999999));
 
+        let label_generator_label = label.clone();
+        let tooltip_generator_label = label.clone();
+
         poster_array = image_to_poster::image_to_posters(
             unwrapped_image,
-            |x,y,w,h| {
+            move |x,y,w,h| {
                 if forced_label {
                     return label.clone();
                 } else {
                     return format!(
                         "{0}: ({1},{2})/({3}x{4})",
-                        label.clone(),
+                        label_generator_label.clone(),
                         x+1,
                         y+1,
                         w,
@@ -349,10 +355,10 @@ fn main() {
                     )
                 }
             },
-            |x,y,w,h| {
+            move |x,y,w,h| {
                 let tooltip: PosterTooltip = PosterTooltip {
                     print_id: print_id.clone(),
-                    print_name: label.clone(),
+                    print_name: tooltip_generator_label.clone(),
                     total_width: w,
                     total_height: h,
                     pos_x: x,
@@ -369,7 +375,7 @@ fn main() {
                         .to_string();
                 }
             },
-            per_poster_quantization_enabled
+            (per_poster_quantization_enabled, Some(cli.jobs.unwrap_or(1)))
         );
     } else if input_format == Format::Poster {
         if input_extension == "2dj" {
