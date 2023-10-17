@@ -181,9 +181,9 @@ The per poster *quantization* **flag** makes the program select the colorpalette
 Aliases:
 
 * `-Q`
-* `--perPosterQuantization`
+* `--per-poster-quantization`
 
 Examples:
 
 * `-Q`
-* `--perPosterQuantization`
+* `--per-poster-quantization`
