@@ -20,7 +20,7 @@ img2poster is written in rust for speed and efficiency! It is faster than most o
 2. Open your terminal of choice
 3. Use it! Check the usage guide below.
 
-## Usage (for 0.0.8)
+## Usage (for 0.0.9)
 
 img2poster is a CLI to convert between images and posters. See the CLI argument and flags below:
 
@@ -54,10 +54,24 @@ Aliases:
 
 Examples:
 
-* `-o myPoster.2dj`
+* `-o ./myPoster.2dj`
 * `--output ./anotherPoster.2dja`
-* `-o myImage.png`
-* `--output myImage.jpg`
+* `-o ./myImage.png`
+* `--output ./myImage.jpg`
+
+---
+### Preview
+
+The preview argument is the file path where you want your preview image to end up.
+
+Aliases:
+* `-p`
+* `--preview`
+
+* `-p ./myPreview.png`
+* `--preview ./myPreview.jpg`
+* `-p ./myPreview.bmp`
+* `--preview ./myPreview.jpeg`
 
 ---
 ### Scale X
