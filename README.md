@@ -68,6 +68,8 @@ Aliases:
 * `-p`
 * `--preview`
 
+Examples: 
+
 * `-p ./myPreview.png`
 * `--preview ./myPreview.jpg`
 * `-p ./myPreview.bmp`
