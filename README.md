@@ -76,6 +76,19 @@ Examples:
 * `--preview ./myPreview.jpeg`
 
 ---
+### Autoscale
+
+Aliases:
+* `-a`
+* `-autoscale`
+
+Examples:
+* `-a <IMAGE_SCALE>`
+* `--autoscale 2 # will resize to 2x the size of the input image`
+* `-a 1 # will resize to the closest possible size of the input image`
+* `--autoscale 1 # will resize to the closest possible size of the input image` 
+
+---
 ### Scale X
 
 The scale-x argument is the amount of pixels on the X axis to scale the poster to. A single poster is always 128x128, which means that **this field has to be a multiple of 128.**
