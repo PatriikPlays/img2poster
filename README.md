@@ -86,13 +86,13 @@ The scale-x argument is the amount of pixels on the X axis to scale the poster t
 Aliases:
 
 * `-x`
-* `--scalex`
+* `--scale-x`
 
 Examples:
 
 * `-x 256`
 * `-x 384`
-* `--scalex 128`
+* `--scale-x 128`
 
 ---
 ### Scale Y
@@ -105,13 +105,13 @@ The scale-y argument is the amount of pixels on the Y axis to scale the poster t
 Aliases:
 
 * `-y`
-* `--scaley`
+* `--scale-y`
 
 Examples:
 
 * `-y 256`
 * `-y 384`
-* `--scaley 128`
+* `--scale-y 128`
 
 ---
 ### Poster Label
