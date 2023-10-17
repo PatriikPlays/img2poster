@@ -108,9 +108,6 @@ fn main() {
             "jpg" => Format::Image,
             "jpeg" => Format::Image,
             "bmp" => Format::Image,
-            // can likely support more image formats, but cant be bothered
-            "2dj" => Format::Poster,
-            "2dja" => Format::Poster,
             _ => {
                 println!("Unsupported preview format: {}", preview_extension);
                 return;
