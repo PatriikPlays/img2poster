@@ -25,6 +25,9 @@ struct Cli {
     #[arg(short, long, value_name = "OUTPUT_FILE")]
     output: PathBuf,
 
+    #[arg(short = 'p', long, value_name = "PREVIEW_OUTPUT_FILE")]
+    preview: Option<PathBuf>,
+
     #[arg(short = 'x', long, value_name = "SCALE_X")]
     scale_x: Option<u32>,
 
@@ -83,6 +86,36 @@ fn main() {
     if !cli.output.parent().unwrap().exists() {
         println!("Output file parent directory doesn't exist.");
         return;
+    }
+    
+    if let Some(ref preview) = cli.preview {
+        if !preview.parent().unwrap().exists() {
+            println!("Preview output file parent directory doesn't exist.");
+            return;
+        }
+
+        let preview_extension = match preview.extension() {
+            Some(t) => t,
+            None => {
+                println!("Preview file has no extension.");
+                return;
+            }
+        }.to_str().unwrap().to_lowercase();
+        let preview_extension = preview_extension.as_str();
+
+        match preview_extension {
+            "png" => Format::Image,
+            "jpg" => Format::Image,
+            "jpeg" => Format::Image,
+            "bmp" => Format::Image,
+            // can likely support more image formats, but cant be bothered
+            "2dj" => Format::Poster,
+            "2dja" => Format::Poster,
+            _ => {
+                println!("Unsupported preview format: {}", preview_extension);
+                return;
+            }
+        };
     }
 
     let input_extension = match cli.input.extension() {
@@ -320,11 +353,22 @@ fn main() {
                 }
 
                 let json_str = serde_json::to_string(&poster_array.pages[0]).expect("Failed to serialize this somehow");
-                fs::write(cli.output, json_str).expect("Failed to write to output file.");
+                fs::write(&cli.output, json_str).expect("Failed to write to output file.");
+
+                if let Some(ref preview) = cli.preview {
+                    println!("Generating preview...");
+                    let output_image = posters_to_dynamic_image(&poster_array);
+                    output_image.save(preview).expect("Failed to save preview image.");
+                }
             },
             "2dja" => {
                 let json_str = serde_json::to_string(&poster_array).expect("Failed to serialize this somehow");
                 fs::write(cli.output, json_str).expect("Failed to write to output file.");
+                if let Some(ref preview) = cli.preview {
+                    println!("Generating preview...");
+                    let output_image = posters_to_dynamic_image(&poster_array);
+                    output_image.save(preview).expect("Failed to save preview image.");
+                }
             },
             _ => {
                 println!("Invalid output extension: {}.", output_extension);
