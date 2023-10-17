@@ -34,6 +34,9 @@ struct Cli {
     #[arg(short = 'y', long, value_name = "SCALE_Y")]
     scale_y: Option<u32>,
 
+    #[arg(short = 'a', long, value_name = "AUTOSCALE")]
+    autoscale: Option<f64>,
+
     #[arg(short, long, value_name = "LABEL")]
     label: Option<String>,
 
@@ -62,6 +65,18 @@ fn read_image(image_file: &PathBuf) -> (bool, Option<DynamicImage>) {
     }
 
     return (true, Some(decoded_image.unwrap()));
+}
+
+fn autoscale_image(mut width: u32, mut height: u32, scale: f64) -> (u32, u32) {
+    //TODO: make this attempt to preserve aspect ratio later
+    width = (width as f64*scale) as u32;
+    height = (height as f64*scale) as u32;
+    let (wr, hr) = (width%128, height%128);
+    let (scaled_x, scaled_y) = (if wr>=64 { width+(128-wr) } else { width-wr }, if hr>=64 { height+(128-hr) } else { height-hr });
+    return (
+        if scaled_x==0 { 128 } else { scaled_x },
+        if scaled_y==0 { 128 } else { scaled_y }
+    )
 }
 
 fn main() {
@@ -159,25 +174,54 @@ fn main() {
         }
     };
 
+
     // TODO: clean up
-    if input_format == Format::Poster {
-        if cli.per_poster_quantization {
-            eprintln!("per-poster-quantization flag only allowed with input format: Image");
+    {
+        let mut e: bool = false;
+        if input_format == Format::Poster {
+            if cli.per_poster_quantization {
+                eprintln!("per-poster-quantization flag only allowed with input format: Image");
+                e = true;
+            }
+            if cli.label.is_some() {
+                eprintln!("label arg only allowed with input format: Image");
+                e = true;
+            }
+            if cli.force_label.is_some() {
+                eprintln!("force-label arg only allowed with input format: Image");
+                e = true;
+            }
+            if cli.force_tooltip.is_some() {
+                eprintln!("force-tooltip arg only allowed with input format: Image");
+                e = true;
+            }
+            if cli.scale_x.is_some() {
+                eprintln!("scale-x arg only allowed with input format: Image");
+                e = true;
+            }
+            if cli.scale_y.is_some() {
+                eprintln!("scale-y arg only allowed with input format: Image");
+                e = true;
+            }
+            if cli.autoscale.is_some() {
+                eprintln!("autoscale arg only allowed with input format: Image");
+                e = true;
+            }
         }
-        if cli.label.is_some() {
-            eprintln!("label arg only allowed with input format: Image");
+
+        if cli.autoscale.is_some() {
+            if cli.scale_x.is_some() {
+                eprintln!("scale-x arg not allowed with autoscale");
+                e = true;
+            }
+            if cli.scale_y.is_some() {
+                eprintln!("scale-y arg not allowed with autoscale");
+                e = true;
+            }
         }
-        if cli.force_label.is_some() {
-            eprintln!("force-label arg only allowed with input format: Image");
-        }
-        if cli.force_tooltip.is_some() {
-            eprintln!("force-tooltip arg only allowed with input format: Image");
-        }
-        if cli.scale_x.is_some() {
-            eprintln!("scale-x arg only allowed with input format: Image");
-        }
-        if cli.scale_y.is_some() {
-            eprintln!("scale-y arg only allowed with input format: Image");
+
+        if e {
+            return;
         }
     }
 
@@ -204,6 +248,15 @@ fn main() {
             if let Some(res) = cli.scale_y {
                 resize = true;
                 resize_y = res;
+            }
+
+            if cli.autoscale.is_some() {
+                let (x, y) = autoscale_image(x_size, y_size, cli.autoscale.unwrap());
+                if x != x_size || y != y_size {
+                    resize_x = x;
+                    resize_y = y;
+                    resize = true;
+                }
             }
 
             if resize && (resize_x < 1 || resize_y < 1) {
