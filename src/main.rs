@@ -88,34 +88,56 @@ fn main() {
     let per_poster_quantization_enabled = cli.per_poster_quantization;
 
     if !cli.input.exists() {
-        println!("Input file doesn't exist.");
+        eprintln!("Input file doesn't exist.");
         return;
     }
     if cli.input.is_dir() {
-        println!("Input can't be a directory.");
+        eprintln!("Input can't be a directory.");
         return;
     }
 
     if cli.output.is_dir() {
-        println!("Output can't be a directory.");
+        eprintln!("Output can't be a directory.");
         return;
     }
 
-    if !cli.output.parent().unwrap().exists() {
-        println!("Output file parent directory doesn't exist.");
-        return;
+    match cli.output.parent() {
+        Some(parent) => {
+            if !parent.exists() {
+                eprintln!("Output file parent directory doesn't exist.");
+                return;    
+            } else if !parent.is_dir() {
+                eprintln!("Output file parent is not a directory.");
+                return;    
+            }
+        },
+        None => {
+            eprintln!("Output file parent directory doesn't exist.");
+            return;
+        }
     }
     
     if let Some(ref preview) = cli.preview {
-        if !preview.parent().unwrap().exists() {
-            println!("Preview output file parent directory doesn't exist.");
-            return;
+        match preview.parent() {
+            Some(parent) => {
+                if !parent.exists() {
+                    eprintln!("Preview file parent directory doesn't exist.");
+                    return;    
+                } else if !parent.is_dir() {
+                    eprintln!("Preview file parent is not a directory.");
+                    return;    
+                }
+            },
+            None => {
+                eprintln!("Preview file parent directory doesn't exist.");
+                return;
+            }
         }
 
         let preview_extension = match preview.extension() {
             Some(t) => t,
             None => {
-                println!("Preview file has no extension.");
+                eprintln!("Preview file has no extension.");
                 return;
             }
         }.to_str().unwrap().to_lowercase();
@@ -127,7 +149,7 @@ fn main() {
             "jpeg" => Format::Image,
             "bmp" => Format::Image,
             _ => {
-                println!("Unsupported preview format: {}", preview_extension);
+                eprintln!("Unsupported preview format: {}", preview_extension);
                 return;
             }
         };
@@ -136,14 +158,14 @@ fn main() {
     let input_extension = match cli.input.extension() {
         Some(t) => t,
         None => {
-            println!("Input file has no extension.");
+            eprintln!("Input file has no extension.");
             return;
         }
     }.to_str().unwrap().to_lowercase();
     let output_extension = match cli.output.extension() {
         Some(t) => t,
         None => {
-            println!("Output file has no extension.");
+            eprintln!("Output file has no extension.");
             return;
         }
     }.to_str().unwrap().to_lowercase();
@@ -159,7 +181,7 @@ fn main() {
         "2dj" => Format::Poster,
         "2dja" => Format::Poster,
         _ => {
-            println!("Unsupported input format: {}", input_extension);
+            eprintln!("Unsupported input format: {}", input_extension);
             return;
         }
     };
@@ -172,7 +194,7 @@ fn main() {
         "2dj" => Format::Poster,
         "2dja" => Format::Poster,
         _ => {
-            println!("Unsupported output format: {}", output_extension);
+            eprintln!("Unsupported output format: {}", output_extension);
             return;
         }
     };
@@ -232,7 +254,7 @@ fn main() {
     if input_format == Format::Image {
         let (image_ok, image) = read_image(&cli.input);
         if !image_ok {
-            println!("Failed to decode or open image.");
+            eprintln!("Failed to decode or open image.");
             return;
         }
         let mut unwrapped_image = image.unwrap();
@@ -263,12 +285,12 @@ fn main() {
             }
 
             if resize && (resize_x < 1 || resize_y < 1) {
-                println!("Can't resize to x:{0} y:{1}", resize_x, resize_y);
+                eprintln!("Can't resize to x:{0} y:{1}", resize_x, resize_y);
                 return;
             }
 
             if resize && ((resize_x % 128 != 0) || (resize_y % 128 != 0)) {
-                println!("Image resolutions have to be multiples of 128 (Attempted to resize to x:{0} y:{1})",resize_x, resize_y);
+                eprintln!("Image resolutions have to be multiples of 128 (Attempted to resize to x:{0} y:{1})",resize_x, resize_y);
                 return;
             }
 
@@ -286,7 +308,7 @@ fn main() {
         }
 
         if (x_size % 128 != 0) || (y_size % 128 != 0) {
-            println!(
+            eprintln!(
                 "Image resolutions have to be multiples of 128 (Currently x:{0} y:{1})",
                 x_size, y_size
             );
@@ -300,7 +322,7 @@ fn main() {
             label = txt.to_string();
             forced_label = true;
             if label.len() > 48 {
-                println!(
+                eprintln!(
                     "Forced label can't be longer than 48 characters, currently {0}",
                     label.len()
                 );
@@ -309,7 +331,7 @@ fn main() {
         } else if let Some(txt) = cli.label {
             label = txt.to_string();
             if label.len() > 23 {
-                println!(
+                eprintln!(
                     "Label can't be longer than 23 characters, currently {0}",
                     label.len()
                 );
@@ -325,7 +347,7 @@ fn main() {
             forced_tooltip = txt.to_string();
             use_forced_tooltip = true;
             if forced_tooltip.len() > 256 {
-                println!(
+                eprintln!(
                     "Forced tooltip can't be longer than 256 characters, currently {0}",
                     forced_tooltip.len()
                 );
@@ -404,7 +426,7 @@ fn main() {
         match output_extension {
             "2dj" => {
                 if poster_array.pages.len() > 1 {
-                    println!("Format 2dj doesn't support multi poster images.");
+                    eprintln!("Format 2dj doesn't support multi poster images.");
                     return;
                 }
 
@@ -427,7 +449,7 @@ fn main() {
                 }
             },
             _ => {
-                println!("Invalid output extension: {}.", output_extension);
+                eprintln!("Invalid output extension: {}.", output_extension);
                 return;
             }
         }
