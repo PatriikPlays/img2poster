@@ -25,70 +25,78 @@ img2poster is written in rust for speed and efficiency! It is faster than most o
 img2poster is a CLI to convert between images and posters. See the CLI argument and flags below:
 
 ---
+
 ### Input **(Required)**
 
 The input argument is the file path to the source image/poster you want to convert into a poster/image.
 
 Aliases:
 
-* `-i`
-* `--input`
+- `-i`
+- `--input`
 
 Examples:
 
-* `-i ./apioform.png`
-* `-i /home/me/images/capy64.jpg`
-* `--input ../mfw.jpg`
-* `-i ./poster.2dj`
-* `-i ./poster.2dja`
+- `-i ./apioform.png`
+- `-i /home/me/images/capy64.jpg`
+- `--input ../mfw.jpg`
+- `-i ./poster.2dj`
+- `-i ./poster.2dja`
 
 ---
+
 ### Output **(Required)**
 
 The output argument is the file path where you want your poster/image files to end up.
 
 Aliases:
 
-* `-o`
-* `--output`
+- `-o`
+- `--output`
 
 Examples:
 
-* `-o ./myPoster.2dj`
-* `--output ./anotherPoster.2dja`
-* `-o ./myImage.png`
-* `--output ./myImage.jpg`
+- `-o ./myPoster.2dj`
+- `--output ./anotherPoster.2dja`
+- `-o ./myImage.png`
+- `--output ./myImage.jpg`
 
 ---
+
 ### Preview
 
 The preview argument is the file path where you want your preview image to end up.
 
 Aliases:
-* `-p`
-* `--preview`
 
-Examples: 
+- `-p`
+- `--preview`
 
-* `-p ./myPreview.png`
-* `--preview ./myPreview.jpg`
-* `-p ./myPreview.bmp`
-* `--preview ./myPreview.jpeg`
+Examples:
+
+- `-p ./myPreview.png`
+- `--preview ./myPreview.jpg`
+- `-p ./myPreview.bmp`
+- `--preview ./myPreview.jpeg`
 
 ---
+
 ### Autoscale
 
 Aliases:
-* `-a`
-* `-autoscale`
+
+- `-a`
+- `-autoscale`
 
 Examples:
-* `-a <IMAGE_SCALE>`
-* `--autoscale 2 # will resize to 2x the size of the input image`
-* `-a 1 # will resize to the closest possible size of the input image`
-* `--autoscale 1 # will resize to the closest possible size of the input image` 
+
+- `-a <IMAGE_SCALE>`
+- `--autoscale 2 # will resize to 2x the size of the input image`
+- `-a 1 # will resize to the closest possible size of the input image`
+- `--autoscale 1 # will resize to the closest possible size of the input image`
 
 ---
+
 ### Scale X
 
 The scale-x argument is the amount of pixels on the X axis to scale the poster to. A single poster is always 128x128, which means that **this field has to be a multiple of 128.**
@@ -101,16 +109,17 @@ The scale-x argument is the amount of pixels on the X axis to scale the poster t
 
 Aliases:
 
-* `-x`
-* `--scale-x`
+- `-x`
+- `--scale-x`
 
 Examples:
 
-* `-x 256`
-* `-x 384`
-* `--scale-x 128`
+- `-x 256`
+- `-x 384`
+- `--scale-x 128`
 
 ---
+
 ### Scale Y
 
 The scale-y argument is the amount of pixels on the Y axis to scale the poster to. A single poster is always 128x128, which means that this field has to be a multiple of 128.
@@ -123,16 +132,17 @@ The scale-y argument is the amount of pixels on the Y axis to scale the poster t
 
 Aliases:
 
-* `-y`
-* `--scale-y`
+- `-y`
+- `--scale-y`
 
 Examples:
 
-* `-y 256`
-* `-y 384`
-* `--scale-y 128`
+- `-y 256`
+- `-y 384`
+- `--scale-y 128`
 
 ---
+
 ### Poster Label
 
 The poster label argument is what to label the poster as.
@@ -145,15 +155,16 @@ The poster label argument is what to label the poster as.
 
 Aliases:
 
-* `-l`
-* `--label`
+- `-l`
+- `--label`
 
 Examples:
 
-* `-l myPoster`
-* `--label ApioformPoster2`
+- `-l myPoster`
+- `--label ApioformPoster2`
 
 ---
+
 ### Force poster label
 
 The force poster label argument is able to overwrite the actual label, instead of the default `<Label>: (x,y)/(totalX*totalY)`.
@@ -163,15 +174,16 @@ The force poster label argument is able to overwrite the actual label, instead o
 
 Aliases:
 
-* `-L`
-* `--forcelabel`
+- `-L`
+- `--forcelabel`
 
 Examples:
 
-* `-L FunnyPoster`
-* `--forcelabel veryPostery`
+- `-L FunnyPoster`
+- `--forcelabel veryPostery`
 
 ---
+
 ### Force poster tooltip
 
 The force poster tooltip argument is similar to the "Force poster label" argument, except this one overwrites the tooltip instead of the default JSON information
@@ -181,28 +193,29 @@ The force poster tooltip argument is similar to the "Force poster label" argumen
 
 Aliases:
 
-* `-T`
-* `--forcetooltip`
+- `-T`
+- `--forcetooltip`
 
 Examples:
 
-* `-T MyCoolTooltip`
-* `--forcetooltip VeryTooltip`
+- `-T MyCoolTooltip`
+- `--forcetooltip VeryTooltip`
 
 ---
+
 ### Per poster quantization
 
-The per poster *quantization* **flag** makes the program select the colorpalette on a per-poster basis.
+The per poster _quantization_ **flag** makes the program select the colorpalette on a per-poster basis.
 
 > **Note**
 > Only use with image input files, not 2dj/2dja
 
 Aliases:
 
-* `-Q`
-* `--per-poster-quantization`
+- `-Q`
+- `--per-poster-quantization`
 
 Examples:
 
-* `-Q`
-* `--per-poster-quantization`
+- `-Q`
+- `--per-poster-quantization`
