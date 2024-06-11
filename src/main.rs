@@ -1,19 +1,40 @@
-mod poster;
 mod image_to_poster;
+mod poster;
 
 use clap::{arg, command, Parser};
 use image::io::Reader as ImageReader;
 use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use poster::*;
+use rand::Rng;
 use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
-use rand::Rng;
 
 #[derive(PartialEq)]
 enum Format {
     Image,
-    Poster
+    Poster,
+}
+
+#[derive(clap::ValueEnum, Clone)]
+enum ResizeAlgorithm {
+    Nearest,
+    Triangle,
+    CatmullRom,
+    Gaussian,
+    Lanczos3,
+}
+
+impl From<ResizeAlgorithm> for FilterType {
+    fn from(value: ResizeAlgorithm) -> Self {
+        match value {
+            ResizeAlgorithm::Nearest => FilterType::Nearest,
+            ResizeAlgorithm::Triangle => FilterType::Triangle,
+            ResizeAlgorithm::CatmullRom => FilterType::CatmullRom,
+            ResizeAlgorithm::Gaussian => FilterType::Gaussian,
+            ResizeAlgorithm::Lanczos3 => FilterType::Lanczos3,
+        }
+    }
 }
 
 #[derive(clap::Parser)]
@@ -34,6 +55,10 @@ struct Cli {
     #[arg(short = 'y', long, value_name = "SCALE_Y")]
     scale_y: Option<u32>,
 
+    /// Algorithm to use for resizing and scaling. Defaults to catmull-rom
+    #[arg(short = 'r', long, value_name = "RESIZE_ALGORITHM")]
+    resize_algorithm: Option<ResizeAlgorithm>,
+
     #[arg(short = 'a', long, value_name = "AUTOSCALE")]
     autoscale: Option<f64>,
 
@@ -50,7 +75,7 @@ struct Cli {
     per_poster_quantization: bool,
 
     #[arg(short = 'j', long, value_name = "JOBS")]
-    jobs: Option<u32>
+    jobs: Option<u32>,
 }
 
 fn read_image(image_file: &PathBuf) -> (bool, Option<DynamicImage>) {
@@ -72,14 +97,25 @@ fn read_image(image_file: &PathBuf) -> (bool, Option<DynamicImage>) {
 
 fn autoscale_image(mut width: u32, mut height: u32, scale: f64) -> (u32, u32) {
     //TODO: make this attempt to preserve aspect ratio later
-    width = (width as f64*scale) as u32;
-    height = (height as f64*scale) as u32;
-    let (wr, hr) = (width%128, height%128);
-    let (scaled_x, scaled_y) = (if wr>=64 { width+(128-wr) } else { width-wr }, if hr>=64 { height+(128-hr) } else { height-hr });
+    width = (width as f64 * scale) as u32;
+    height = (height as f64 * scale) as u32;
+    let (wr, hr) = (width % 128, height % 128);
+    let (scaled_x, scaled_y) = (
+        if wr >= 64 {
+            width + (128 - wr)
+        } else {
+            width - wr
+        },
+        if hr >= 64 {
+            height + (128 - hr)
+        } else {
+            height - hr
+        },
+    );
     return (
-        if scaled_x==0 { 128 } else { scaled_x },
-        if scaled_y==0 { 128 } else { scaled_y }
-    )
+        if scaled_x == 0 { 128 } else { scaled_x },
+        if scaled_y == 0 { 128 } else { scaled_y },
+    );
 }
 
 fn main() {
@@ -105,29 +141,29 @@ fn main() {
         Some(parent) => {
             if !parent.exists() {
                 eprintln!("Output file parent directory doesn't exist.");
-                return;    
+                return;
             } else if !parent.is_dir() {
                 eprintln!("Output file parent is not a directory.");
-                return;    
+                return;
             }
-        },
+        }
         None => {
             eprintln!("Output file parent directory doesn't exist.");
             return;
         }
     }
-    
+
     if let Some(ref preview) = cli.preview {
         match preview.parent() {
             Some(parent) => {
                 if !parent.exists() {
                     eprintln!("Preview file parent directory doesn't exist.");
-                    return;    
+                    return;
                 } else if !parent.is_dir() {
                     eprintln!("Preview file parent is not a directory.");
-                    return;    
+                    return;
                 }
-            },
+            }
             None => {
                 eprintln!("Preview file parent directory doesn't exist.");
                 return;
@@ -140,7 +176,10 @@ fn main() {
                 eprintln!("Preview file has no extension.");
                 return;
             }
-        }.to_str().unwrap().to_lowercase();
+        }
+        .to_str()
+        .unwrap()
+        .to_lowercase();
         let preview_extension = preview_extension.as_str();
 
         match preview_extension {
@@ -161,14 +200,20 @@ fn main() {
             eprintln!("Input file has no extension.");
             return;
         }
-    }.to_str().unwrap().to_lowercase();
+    }
+    .to_str()
+    .unwrap()
+    .to_lowercase();
     let output_extension = match cli.output.extension() {
         Some(t) => t,
         None => {
             eprintln!("Output file has no extension.");
             return;
         }
-    }.to_str().unwrap().to_lowercase();
+    }
+    .to_str()
+    .unwrap()
+    .to_lowercase();
     let input_extension = input_extension.as_str();
     let output_extension = output_extension.as_str();
 
@@ -198,7 +243,6 @@ fn main() {
             return;
         }
     };
-
 
     // TODO: clean up
     {
@@ -302,8 +346,13 @@ fn main() {
 
                 x_size = resize_x;
                 y_size = resize_y;
-                unwrapped_image =
-                    unwrapped_image.resize_exact(resize_x, resize_y, FilterType::CatmullRom);
+                unwrapped_image = unwrapped_image.resize_exact(
+                    resize_x,
+                    resize_y,
+                    cli.resize_algorithm
+                        .unwrap_or(ResizeAlgorithm::CatmullRom)
+                        .into(),
+                );
             }
         }
 
@@ -355,29 +404,28 @@ fn main() {
             }
         }
 
-
-        let print_id = format!("{:0>6}",rand::thread_rng().gen_range(0..999999));
+        let print_id = format!("{:0>6}", rand::thread_rng().gen_range(0..999999));
 
         let label_generator_label = label.clone();
         let tooltip_generator_label = label.clone();
 
         poster_array = image_to_poster::image_to_posters(
             unwrapped_image,
-            move |x,y,w,h| {
+            move |x, y, w, h| {
                 if forced_label {
                     return label.clone();
                 } else {
                     return format!(
                         "{0}: ({1},{2})/({3}x{4})",
                         label_generator_label.clone(),
-                        x+1,
-                        y+1,
+                        x + 1,
+                        y + 1,
                         w,
                         h
-                    )
+                    );
                 }
             },
-            move |x,y,w,h| {
+            move |x, y, w, h| {
                 let tooltip: PosterTooltip = PosterTooltip {
                     print_id: print_id.clone(),
                     print_name: tooltip_generator_label.clone(),
@@ -397,7 +445,7 @@ fn main() {
                         .to_string();
                 }
             },
-            (per_poster_quantization_enabled, Some(cli.jobs.unwrap_or(1)))
+            (per_poster_quantization_enabled, Some(cli.jobs.unwrap_or(1))),
         );
     } else if input_format == Format::Poster {
         if input_extension == "2dj" {
@@ -408,10 +456,13 @@ fn main() {
                 title: "untitled".to_string(),
             };
             let reader = File::open(cli.input).expect("Failed to open input file.");
-            poster_array.pages.push(serde_json::from_reader(reader).expect("Failed to parse json in input file"));
+            poster_array
+                .pages
+                .push(serde_json::from_reader(reader).expect("Failed to parse json in input file"));
         } else if input_extension == "2dja" {
             let reader = File::open(cli.input).expect("Failed to open input file.");
-            poster_array = serde_json::from_reader(reader).expect("Failed to parse json in input file");
+            poster_array =
+                serde_json::from_reader(reader).expect("Failed to parse json in input file");
         } else {
             eprintln!("Shouldn't have gotten here 0");
             return;
@@ -430,24 +481,30 @@ fn main() {
                     return;
                 }
 
-                let json_str = serde_json::to_string(&poster_array.pages[0]).expect("Failed to serialize this somehow");
+                let json_str = serde_json::to_string(&poster_array.pages[0])
+                    .expect("Failed to serialize this somehow");
                 fs::write(&cli.output, json_str).expect("Failed to write to output file.");
 
                 if let Some(ref preview) = cli.preview {
                     println!("Generating preview...");
                     let output_image = posters_to_dynamic_image(&poster_array);
-                    output_image.save(preview).expect("Failed to save preview image.");
+                    output_image
+                        .save(preview)
+                        .expect("Failed to save preview image.");
                 }
-            },
+            }
             "2dja" => {
-                let json_str = serde_json::to_string(&poster_array).expect("Failed to serialize this somehow");
+                let json_str =
+                    serde_json::to_string(&poster_array).expect("Failed to serialize this somehow");
                 fs::write(cli.output, json_str).expect("Failed to write to output file.");
                 if let Some(ref preview) = cli.preview {
                     println!("Generating preview...");
                     let output_image = posters_to_dynamic_image(&poster_array);
-                    output_image.save(preview).expect("Failed to save preview image.");
+                    output_image
+                        .save(preview)
+                        .expect("Failed to save preview image.");
                 }
-            },
+            }
             _ => {
                 eprintln!("Invalid output extension: {}.", output_extension);
                 return;
@@ -456,6 +513,8 @@ fn main() {
     } else if output_format == Format::Image {
         let output_image = posters_to_dynamic_image(&poster_array);
 
-        output_image.save(cli.output).expect("Failed to save image.");
+        output_image
+            .save(cli.output)
+            .expect("Failed to save image.");
     }
 }
