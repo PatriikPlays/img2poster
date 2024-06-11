@@ -143,6 +143,30 @@ Examples:
 
 ---
 
+### Resizing Algorithm
+
+The algorithm to use for scaling the input.
+
+Acceptable values:
+
+- `nearest`
+- `triangle`
+- `catmull-rom` (default)
+- `gaussian`
+- `lanczos3`
+
+Aliases:
+
+- `-r`
+- `--resize-algorithm`
+
+Examples:
+
+- `-r nearest`
+- `--resize-algorithm lanczos3`
+
+---
+
 ### Poster Label
 
 The poster label argument is what to label the poster as.
