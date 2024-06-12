@@ -86,7 +86,7 @@ Examples:
 
 Autoscale automatically scales the image to its original resolution, rounded to nearest 128px.
 
-Aliases:
+Syntax:
 
 - `-a <IMAGE_SCALE>`
 - `-autoscale <IMAGE_SCALE>`
@@ -109,10 +109,10 @@ A single poster is always 128x128, which means that **this field has to be a mul
 > [!NOTE]
 > Cannot be used with autoscale
 
-Aliases:
+Syntax:
 
-- `-x`
-- `--scale-x`
+- `-x <SCALE_X>`
+- `--scale-x <SCALE_X>`
 
 Examples:
 
@@ -133,10 +133,10 @@ A single poster is always 128x128, which means that this field has to be a multi
 > [!NOTE]
 > Cannot be used with autoscale
 
-Aliases:
+Syntax:
 
-- `-y`
-- `--scale-y`
+- `-y <SCALE_Y>`
+- `--scale-y <SCALE_Y>`
 
 Examples:
 
@@ -221,7 +221,7 @@ The force poster tooltip argument overwrites the default tooltip with the suppli
 > [!NOTE]
 > Only use with image input files, not 2dj/2dja
 
-Snytax:
+Syntax:
 
 - `-T <TOOLTIP>`
 - `--forcetooltip <TOOLTIP>`
