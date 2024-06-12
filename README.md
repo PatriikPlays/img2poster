@@ -2,115 +2,117 @@
 
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/PatriikPlays/img2poster?include_prereleases&label=Latest%20release&style=flat-square)
 
-Image to poster CLI converter tool for [SwitchCraft3](https://sc3.io) posters.
-
-img2poster is written in rust for speed and efficiency! It is faster than most other implementations of 2dj(a).
+Rust based CLI tool for converting and manipulating [SwitchCraft3](https://sc3.io) posters.
 
 ## Installation
 
 ### Windows
 
-1. Download the latest windows executable from GitHub releases. `img2poster-win.exe`
+1. Download the latest windows executable from GitHub releases (`img2poster-win.exe`)
 2. Open your terminal (cmd)
-3. Use it! Check out usage guide below.
+3. Use it! Check out usage guide below
 
 ### Linux
 
-1. Download the latest Linux executable from GitHub releases. `img2poster-lnx`
+1. Download the latest Linux executable from GitHub releases (`img2poster-lnx`)
 2. Open your terminal of choice
-3. Use it! Check the usage guide below.
+3. Use it! Check the usage guide below
 
-## Usage (for 0.1.0)
+## Usage
 
-img2poster is a CLI to convert between images and posters. See the CLI argument and flags below:
+### Input
 
----
-
-### Input **(Required)**
+> [!NOTE]
+> This argument is required
 
 The input argument is the file path to the source image/poster you want to convert into a poster/image.
 
-Aliases:
+Syntax:
 
-- `-i`
-- `--input`
+- `-i <INPUT_FILE>`
+- `--input <INPUT_FILE>`
 
 Examples:
 
 - `-i ./apioform.png`
 - `-i /home/me/images/capy64.jpg`
-- `--input ../mfw.jpg`
+- `--input ~/mfw.jpg`
 - `-i ./poster.2dj`
 - `-i ./poster.2dja`
 
 ---
 
-### Output **(Required)**
+### Output
+
+> [!NOTE]
+> This argument is required
 
 The output argument is the file path where you want your poster/image files to end up.
 
-Aliases:
+Syntax:
 
-- `-o`
-- `--output`
+- `-o <OUTPUT_FILE>`
+- `--output <OUTPUT_FILE>`
 
 Examples:
 
 - `-o ./myPoster.2dj`
-- `--output ./anotherPoster.2dja`
-- `-o ./myImage.png`
+- `--output ~/anotherPoster.2dja`
+- `-o /home/me/myImage.png`
 - `--output ./myImage.jpg`
 
 ---
 
 ### Preview
 
-The preview argument is the file path where you want your preview image to end up.
+It is possible to preview the poster in a normal image format.
+To do this specify the preview argument with a path.
 
-Aliases:
+Syntax:
 
-- `-p`
-- `--preview`
+- `-p <PREVIEW_OUTPUT_FILE>`
+- `--preview <PREVIEW_OUTPUT_FILE>`
 
 Examples:
 
-- `-p ./myPreview.png`
+- `-p ~/myPreview.png`
+- `-p ../myPreview.bmp`
 - `--preview ./myPreview.jpg`
-- `-p ./myPreview.bmp`
-- `--preview ./myPreview.jpeg`
+- `--preview /home/me/myPreview.jpeg`
 
 ---
 
 ### Autoscale
 
-Aliases:
+Autoscale automatically scales the image to its original resolution, rounded to nearest 128px.
 
-- `-a`
-- `-autoscale`
+Syntax:
+
+- `-a <IMAGE_SCALE>`
+- `-autoscale <IMAGE_SCALE>`
 
 Examples:
 
-- `-a <IMAGE_SCALE>`
-- `--autoscale 2 # will resize to 2x the size of the input image`
-- `-a 1 # will resize to the closest possible size of the input image`
-- `--autoscale 1 # will resize to the closest possible size of the input image`
+- `--autoscale 2` will resize to 2x the size of the input image
+- `-a 1` will resize to the closest possible size of the input image
 
 ---
 
 ### Scale X
 
-The scale-x argument is the amount of pixels on the X axis to scale the poster to. A single poster is always 128x128, which means that **this field has to be a multiple of 128.**
+The scale-x argument is the amount of pixels on the X axis to scale the poster to.
+A single poster is always 128x128, which means that **this field has to be a multiple of 128.**
 
-> **Note**
+> [!NOTE]
 > Only use with image input files, not 2dj/2dja
 
-> **Note**
+> [!NOTE]
 > Cannot be used with autoscale
 
-Aliases:
+Syntax:
 
-- `-x`
-- `--scale-x`
+- `-x <SCALE_X>`
+- `--scale-x <SCALE_X>`
 
 Examples:
 
@@ -122,18 +124,19 @@ Examples:
 
 ### Scale Y
 
-The scale-y argument is the amount of pixels on the Y axis to scale the poster to. A single poster is always 128x128, which means that this field has to be a multiple of 128.
+The scale-y argument is the amount of pixels on the Y axis to scale the poster to.
+A single poster is always 128x128, which means that this field has to be a multiple of 128.
 
-> **Note**
+> [!NOTE]
 > Only use with image input files, not 2dj/2dja
 
-> **Note**
+> [!NOTE]
 > Cannot be used with autoscale
 
-Aliases:
+Syntax:
 
-- `-y`
-- `--scale-y`
+- `-y <SCALE_Y>`
+- `--scale-y <SCALE_Y>`
 
 Examples:
 
@@ -155,10 +158,10 @@ Acceptable values:
 - `gaussian`
 - `lanczos3`
 
-Aliases:
+Syntax:
 
-- `-r`
-- `--resize-algorithm`
+- `-r <RESIZE_ALGORITHM>`
+- `--resize-algorithm <RESIZE_ALGORITHM>`
 
 Examples:
 
@@ -171,16 +174,19 @@ Examples:
 
 The poster label argument is what to label the poster as.
 
-> **Note**
+> [!NOTE]
 > Only use with image input files, not 2dj/2dja
 
-> **Note**
+> [!NOTE]
 > The poster label cannot be longer than 25 characters
 
-Aliases:
+> [!NOTE]
+> The label will end up as `<LABEL>: (x,y)/(totalX*totalY)`. To force your own label use -L (see below)
 
-- `-l`
-- `--label`
+Syntax:
+
+- `-l <LABEL>`
+- `--label <LABEL>`
 
 Examples:
 
@@ -191,15 +197,15 @@ Examples:
 
 ### Force poster label
 
-The force poster label argument is able to overwrite the actual label, instead of the default `<Label>: (x,y)/(totalX*totalY)`.
+The force poster label argument overwrites the actual label, instead of the default `<LABEL>: (x,y)/(totalX*totalY)`.
 
-> **Note**
+> [!NOTE]
 > Only use with image input files, not 2dj/2dja
 
-Aliases:
+Syntax:
 
-- `-L`
-- `--forcelabel`
+- `-L <FORCED_LABEL>`
+- `--forcelabel <FORCED_LABEL>`
 
 Examples:
 
@@ -210,15 +216,15 @@ Examples:
 
 ### Force poster tooltip
 
-The force poster tooltip argument is similar to the "Force poster label" argument, except this one overwrites the tooltip instead of the default JSON information
+The force poster tooltip argument overwrites the default tooltip with the supplied string.
 
-> **Note**
+> [!NOTE]
 > Only use with image input files, not 2dj/2dja
 
-Aliases:
+Syntax:
 
-- `-T`
-- `--forcetooltip`
+- `-T <TOOLTIP>`
+- `--forcetooltip <TOOLTIP>`
 
 Examples:
 
@@ -229,12 +235,12 @@ Examples:
 
 ### Per poster quantization
 
-The per poster _quantization_ **flag** makes the program select the colorpalette on a per-poster basis.
+The per poster quantization flag makes the program select the colorpalette on a per-poster basis.
 
-> **Note**
+> [!NOTE]
 > Only use with image input files, not 2dj/2dja
 
-Aliases:
+Syntax:
 
 - `-Q`
 - `--per-poster-quantization`

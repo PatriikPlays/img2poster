@@ -65,7 +65,7 @@ struct Cli {
     #[arg(short, long, value_name = "LABEL")]
     label: Option<String>,
 
-    #[arg(short = 'L', long = "forcelabel", value_name = "LABEL")]
+    #[arg(short = 'L', long = "forcelabel", value_name = "FORCED_LABEL")]
     force_label: Option<String>,
 
     #[arg(short = 'T', long = "forcetooltip", value_name = "TOOLTIP")]
